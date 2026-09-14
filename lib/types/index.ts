@@ -1,64 +1,70 @@
-export interface User {
+export type User = {
   id: string
   email: string
   created_at: string
+  updated_at: string
 }
 
-export interface Business {
+export type Business = {
   id: string
   user_id: string
   name: string
-  description: string | null
-  phone: string | null
-  email: string | null
-  address: string | null
-  city: string | null
-  state: string | null
-  zip: string | null
-  country: string | null
-  website: string | null
-  logo_url: string | null
+  description?: string
+  phone?: string
+  email?: string
+  address?: string
+  city?: string
+  state?: string
+  zip?: string
+  country?: string
+  website?: string
+  logo_url?: string
+  currency: string
   created_at: string
   updated_at: string
 }
 
-export interface Customer {
+export type Customer = {
   id: string
   business_id: string
   name: string
-  email: string | null
-  phone: string | null
-  address: string | null
-  city: string | null
-  state: string | null
-  zip: string | null
-  country: string | null
+  email?: string
+  phone?: string
+  address?: string
+  city?: string
+  state?: string
+  zip?: string
+  country?: string
+  notes?: string
   created_at: string
   updated_at: string
 }
 
-export interface Product {
+export type Product = {
   id: string
   business_id: string
   name: string
-  description: string | null
+  description?: string
+  type: 'product' | 'service'
   price: number
+  active: boolean
   created_at: string
   updated_at: string
 }
 
-export interface Enquiry {
+export type Enquiry = {
   id: string
   business_id: string
   customer_id: string
   subject: string
   message: string
   status: 'new' | 'contacted' | 'closed'
+  source?: string
   created_at: string
   updated_at: string
 }
 
-export interface Order {
+export type Order = {
   id: string
   business_id: string
   customer_id: string
@@ -67,15 +73,15 @@ export interface Order {
   paid_amount: number
   outstanding_amount: number
   status: 'draft' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled'
-  notes: string | null
+  notes?: string
   created_at: string
   updated_at: string
 }
 
-export interface OrderItem {
+export type OrderItem = {
   id: string
   order_id: string
-  product_id: string | null
+  product_id?: string
   description: string
   quantity: number
   unit_price: number
@@ -83,24 +89,25 @@ export interface OrderItem {
   created_at: string
 }
 
-export interface Payment {
+export type Payment = {
   id: string
   business_id: string
   order_id: string
   amount: number
-  payment_method: string
-  reference: string | null
-  notes: string | null
+  payment_method: 'cash' | 'bank_transfer' | 'mobile_money' | 'card' | 'other'
+  reference?: string
+  notes?: string
+  paid_at: string
   created_at: string
 }
 
-export interface FollowUp {
+export type FollowUp = {
   id: string
   business_id: string
-  customer_id: string | null
-  order_id: string | null
+  customer_id?: string
+  order_id?: string
   title: string
-  description: string | null
+  description?: string
   due_date: string
   status: 'pending' | 'completed'
   created_at: string
