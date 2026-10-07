@@ -1,8 +1,10 @@
-import { type NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
 export async function middleware(request: NextRequest) {
-  const requestUrl = new URL(request.url)
+  const url = new URL(request.url)
+  const pathname = url.pathname
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -18,36 +20,37 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) =>
+          cookiesToSet.forEach(({ name, value, options }) => {
             response.cookies.set(name, value, options)
-          )
+          })
         },
       },
     }
   )
 
-  // Check if user is authenticated
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser()
 
-  // Protect dashboard routes
-  if (requestUrl.pathname.startsWith('/dashboard') && !user) {
+  const protectedRoutes = ['/dashboard']
+  const authRoutes = ['/login', '/signup']
+
+  const isProtected = protectedRoutes.some((route) => pathname.startsWith(route))
+  const isAuthRoute = authRoutes.includes(pathname)
+
+  if (isProtected && (!user || error)) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Redirect authenticated users away from auth pages
-  if ((requestUrl.pathname === '/login' || requestUrl.pathname === '/signup') && user) {
+  if (isAuthRoute && user) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  // Redirect root to appropriate page
-  if (requestUrl.pathname === '/') {
-    if (user) {
-      return NextResponse.redirect(new URL('/dashboard', request.url))
-    } else {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
+  if (pathname === '/') {
+    return NextResponse.redirect(
+      user ? new URL('/dashboard', request.url) : new URL('/login', request.url)
+    )
   }
 
   return response
